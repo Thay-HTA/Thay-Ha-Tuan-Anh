@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#C8102E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vật Lý HTA">
+<title>Vật Lý Thầy Hạ Tuấn Anh</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#C8102E;--red-dark:#9E0B22;--red-light:#FDE8EC;--red-mid:#F5B8C0;
+  --navy:#003087;--navy-light:#E8EEF8;--navy-mid:#B5C8E8;
+  --green:#1A7A4A;--green-light:#E8F5EE;
+  --amber:#9A6700;--amber-light:#FEF3E2;
+  --gray:#F2F3F7;--gray2:#E8E9EC;--gray3:#999;
+  --text:#111111;--text2:#555;--text3:#888;
+  --white:#FFFFFF;--border:#E0E2E8;
+  --radius:12px;--radius-sm:8px;--shadow:0 2px 12px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:'Be Vietnam Pro',sans-serif;background:#F2F3F7;color:var(--text)}
+
+/* ── App shell ── */
+#app{height:100%;display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:relative;background:var(--white);box-shadow:0 0 40px rgba(0,0,0,.12)}
+.screen{display:none;flex-direction:column;height:100%}
+.screen.active{display:flex}
+
+/* ── Status bar ── */
+.sbar{height:44px;background:var(--red);display:flex;align-items:flex-end;padding:0 16px 8px;justify-content:space-between;flex-shrink:0}
+.sbar-time{font-size:12px;font-weight:600;color:rgba(255,255,255,.9)}
+.sbar-icons{display:flex;gap:5px;align-items:center}
+.sbar-icons span{font-size:10px;color:rgba(255,255,255,.8)}
+
+/* ── Header ── */
+.hdr{background:var(--red);padding:0 16px 16px;flex-shrink:0}
+.hdr-logo-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.hdr-logo{font-size:12px;font-weight:700;color:#fff;letter-spacing:.8px;text-transform:uppercase}
+.hdr-bell{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.hdr-bell svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2}
+.hdr-user{display:flex;align-items:center;gap:10px}
+.avatar{width:40px;height:40px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--red);flex-shrink:0;border:2px solid rgba(255,255,255,.3)}
+.hdr-name{font-size:14px;font-weight:600;color:#fff;margin-bottom:2px}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.7)}
+
+/* ── Page header (inner screens) ── */
+.page-hdr{background:var(--red);padding:0 16px 16px;flex-shrink:0}
+.page-hdr-top{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.back-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.back-btn svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.page-title{font-size:15px;font-weight:600;color:#fff;flex:1}
+.page-sub{font-size:11px;color:rgba(255,255,255,.65);padding-left:42px}
+
+/* ── Scrollable content ── */
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;background:var(--gray)}
+.scroll::-webkit-scrollbar{display:none}
+
+/* ── Cards ── */
+.card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:10px;overflow:hidden}
+.card-pad{padding:14px}
+.card-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.card-title{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px}
+.card-more{font-size:11px;color:var(--red);font-weight:500}
+
+/* ── Hero balance card ── */
+.hero-card{background:var(--white);border-radius:var(--radius);margin:0 0 10px;padding:14px;box-shadow:var(--shadow);border:none}
+.hero-label{font-size:11px;color:var(--text3);margin-bottom:4px}
+.hero-val{font-size:11px;color:var(--text);font-weight:500}
+.hero-progress-wrap{margin:10px 0 0}
+.hero-prog-label{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:5px}
+.prog-track{height:6px;background:var(--gray2);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;background:var(--red);transition:width .6s ease}
+.hero-divider{height:1px;background:var(--gray2);margin:12px 0}
+.hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.hs-num{font-size:18px;font-weight:700;color:var(--navy)}
+.hs-num.red{color:var(--red)}
+.hs-num.green{color:var(--green)}
+.hs-lbl{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* ── Quick actions ── */
+.qa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.qa-item{background:var(--white);border-radius:var(--radius-sm);padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;border:1px solid var(--border);transition:all .15s}
+.qa-item:active{transform:scale(.95);background:var(--gray)}
+.qa-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.qa-icon svg{width:18px;height:18px;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ic-red{background:var(--red-light)}.ic-red svg{stroke:var(--red)}
+.ic-navy{background:var(--navy-light)}.ic-navy svg{stroke:var(--navy)}
+.ic-green{background:var(--green-light)}.ic-green svg{stroke:var(--green)}
+.ic-amber{background:var(--amber-light)}.ic-amber svg{stroke:var(--amber)}
+.qa-lbl{font-size:10px;color:var(--text2);font-weight:500;text-align:center;line-height:1.3}
+
+/* ── List items ── */
+.li{display:flex;align-items:center;padding:10px 14px;gap:10px;border-bottom:1px solid var(--gray2)}
+.li:last-child{border-bottom:none}
+.li-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.li-icon svg{width:17px;height:17px;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.li-body{flex:1;min-width:0}
+.li-title{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.li-right{text-align:right;flex-shrink:0}
+.li-val{font-size:13px;font-weight:600}
+.li-val.red{color:var(--red)}
+.li-val.green{color:var(--green)}
+.li-val.navy{color:var(--navy)}
+
+/* ── Badges ── */
+.badge{font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;flex-shrink:0}
+.bd-red{background:var(--red-light);color:var(--red)}
+.bd-green{background:var(--green-light);color:var(--green)}
+.bd-navy{background:var(--navy-light);color:var(--navy)}
+.bd-amber{background:var(--amber-light);color:var(--amber)}
+.bd-gray{background:var(--gray2);color:var(--gray3)}
+
+/* ── Section heading ── */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin:14px 0 8px}
+.sec-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.sec-more{font-size:11px;color:var(--red);font-weight:500}
+
+/* ── Attendance dots ── */
+.dot-grid{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.dot{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;border:1.5px solid}
+.d-ok{background:var(--green-light);color:var(--green);border-color:#B8DECA}
+.d-no{background:var(--red-light);color:var(--red);border-color:var(--red-mid)}
+.d-pm{background:var(--amber-light);color:var(--amber);border-color:#F5D99A}
+.d-nd{background:var(--gray2);color:var(--gray3);border-color:var(--border)}
+.dot-legend{display:flex;gap:12px;margin-top:8px}
+.dot-legend-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text3)}
+.dot-legend-color{width:10px;height:10px;border-radius:3px}
+
+/* ── Score grid ── */
+.score-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.sc{background:var(--gray);border-radius:8px;padding:7px 4px;text-align:center;border:1px solid var(--border)}
+.sc.hi{background:var(--red-light);border-color:var(--red-mid)}
+.sc-n{font-size:14px;font-weight:700;color:var(--text)}
+.sc-n.hi{color:var(--red)}
+.sc-l{font-size:9px;color:var(--text3);margin-top:2px}
+
+/* ── HP card ── */
+.hp-info-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray2);font-size:12px}
+.hp-info-row:last-child{border-bottom:none}
+.hp-key{color:var(--text3)}
+.hp-val{color:var(--text);font-weight:500}
+
+/* ── Schedule day box ── */
+.day-box{width:38px;height:38px;border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
+.day-box.red{background:var(--red);color:#fff}
+.day-box.navy{background:var(--navy);color:#fff}
+.day-box.gray{background:var(--gray2);color:var(--text2)}
+.day-thu{font-size:8px;font-weight:500;opacity:.8;line-height:1}
+.day-num{font-size:13px;font-weight:800;line-height:1.2}
+
+/* ── Bottom nav ── */
+.bnav{background:var(--white);border-top:1px solid var(--gray2);display:flex;padding:8px 0 max(10px,env(safe-area-inset-bottom));flex-shrink:0}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:all .15s}
+.bn svg{width:22px;height:22px;fill:none;stroke:var(--gray3);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s}
+.bn span{font-size:9px;color:var(--gray3);font-weight:500;transition:color .15s}
+.bn.act svg{stroke:var(--red)}
+.bn.act span{color:var(--red);font-weight:700}
+
+/* ── Loading ── */
+#loading{position:absolute;inset:0;background:var(--red);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999}
+.loading-logo{width:72px;height:72px;border-radius:20px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;margin-bottom:20px;animation:pulse 1.5s ease-in-out infinite}
+.loading-logo-text{font-size:26px;font-weight:800;color:#fff;letter-spacing:-1px}
+.loading-title{font-size:16px;font-weight:600;color:#fff;margin-bottom:6px}
+.loading-sub{font-size:12px;color:rgba(255,255,255,.65);text-align:center}
+.loading-dots{display:flex;gap:6px;margin-top:20px}
+.loading-dots span{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.5);animation:bounce .8s ease-in-out infinite}
+.loading-dots span:nth-child(2){animation-delay:.15s}
+.loading-dots span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,80%,100%{transform:scale(.8);opacity:.5}40%{transform:scale(1.1);opacity:1}}
+@keyframes pulse{0%,100%{opacity:.8}50%{opacity:1}}
+
+/* ── Login screen ── */
+#screen-login{background:var(--white)}
+.login-top{background:var(--red);padding:48px 24px 32px;display:flex;flex-direction:column;align-items:center}
+.login-icon{width:68px;height:68px;border-radius:20px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.login-icon-text{font-size:24px;font-weight:800;color:#fff;letter-spacing:-1px}
+.login-app-name{font-size:17px;font-weight:700;color:#fff;margin-bottom:4px;text-align:center}
+.login-app-sub{font-size:12px;color:rgba(255,255,255,.7);text-align:center;line-height:1.5}
+.login-form{padding:28px 20px;flex:1}
+.login-lbl{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;display:block}
+.login-inp{width:100%;height:46px;border:1.5px solid var(--border);border-radius:10px;padding:0 14px;font-size:15px;color:var(--text);font-family:inherit;outline:none;background:var(--gray);letter-spacing:.5px;transition:border .2s}
+.login-inp:focus{border-color:var(--red);background:var(--white)}
+.login-inp-wrap{position:relative;margin-bottom:16px}
+.login-btn{width:100%;height:48px;background:var(--red);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;letter-spacing:.3px;transition:all .2s}
+.login-btn:active{transform:scale(.98);background:var(--red-dark)}
+.login-err{background:var(--red-light);color:var(--red);font-size:12px;padding:8px 12px;border-radius:8px;margin-bottom:12px;display:none;border:1px solid var(--red-mid)}
+.login-foot{font-size:11px;color:var(--text3);text-align:center;margin-top:20px;line-height:1.6}
+.login-divider{display:flex;align-items:center;gap:10px;margin:16px 0}
+.login-divider-line{flex:1;height:1px;background:var(--border)}
+.login-divider-txt{font-size:11px;color:var(--text3)}
+.login-qr{display:flex;align-items:center;justify-content:center;gap:6px;color:var(--red);font-size:12px;font-weight:500;cursor:pointer}
+.login-qr svg{width:16px;height:16px;fill:none;stroke:var(--red);stroke-width:2}
+
+/* ── Error/empty state ── */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center}
+.empty-icon{width:60px;height:60px;border-radius:50%;background:var(--gray2);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.empty-icon svg{width:28px;height:28px;fill:none;stroke:var(--gray3);stroke-width:1.5}
+.empty-title{font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px}
+.empty-sub{font-size:12px;color:var(--text3);line-height:1.6}
+
+/* ── Toast ── */
+#toast{position:absolute;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:#fff;padding:9px 18px;border-radius:20px;font-size:12px;font-weight:500;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;z-index:999}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── Compare row ── */
+.cmp-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.cmp-cell{background:var(--gray);border-radius:9px;padding:9px 4px;text-align:center;border:1px solid var(--border)}
+.cmp-cell.me{background:var(--red-light);border-color:var(--red-mid)}
+.cmp-n{font-size:16px;font-weight:700;color:var(--text)}
+.cmp-n.red{color:var(--red)}
+.cmp-n.green{color:var(--green)}
+.cmp-l{font-size:9px;color:var(--text3);margin-top:2px}
+
+/* ── Notification dot ── */
+.notif-dot{width:8px;height:8px;border-radius:50%;background:#FF4444;position:absolute;top:-2px;right:-2px;border:1.5px solid var(--red)}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+<!-- LOADING -->
+<div id="loading">
+  <div class="loading-logo"><div class="loading-logo-text">VL</div></div>
+  <div class="loading-title">Vật Lý Thầy Hạ Tuấn Anh</div>
+  <div class="loading-sub">Đang tải dữ liệu...</div>
+  <div class="loading-dots"><span></span><span></span><span></span></div>
+</div>
+
+<!-- SCREEN: LOGIN -->
+<div id="screen-login" class="screen active" style="overflow-y:auto">
+  <div class="login-top">
+    <div class="login-icon"><div class="login-icon-text">VL</div></div>
+    <div class="login-app-name">Vật Lý Thầy Hạ Tuấn Anh</div>
+    <div class="login-app-sub">Theo dõi kết quả học tập<br>Lịch học · Điểm số · Chuyên cần</div>
+  </div>
+  <div class="login-form">
+    <div id="login-err" class="login-err">Không tìm thấy học sinh. Kiểm tra lại mã.</div>
+    <label class="login-lbl">Mã học sinh (8 số)</label>
+    <div class="login-inp-wrap">
+      <input class="login-inp" id="inp-id" type="tel" maxlength="8" placeholder="20080001" autocomplete="off">
+    </div>
+    <label class="login-lbl">Lớp học thêm</label>
+    <div class="login-inp-wrap">
+      <select class="login-inp" id="inp-class" style="appearance:none;cursor:pointer">
+        <option value="">-- Chọn lớp --</option>
+        <option value="10L1">10L1</option>
+        <option value="10L2">10L2</option>
+        <option value="10L3">10L3</option>
+        <option value="10L4">10L4</option>
+        <option value="11L1">11L1</option>
+        <option value="11L2">11L2</option>
+        <option value="11L3">11L3</option>
+        <option value="11L4">11L4</option>
+        <option value="12L1">12L1</option>
+        <option value="12L2">12L2</option>
+        <option value="12L3">12L3</option>
+        <option value="12L4">12L4</option>
+      </select>
+    </div>
+    <button class="login-btn" id="btn-login">ĐĂNG NHẬP</button>
+    <div class="login-divider">
+      <div class="login-divider-line"></div>
+      <span class="login-divider-txt">hoặc</span>
+      <div class="login-divider-line"></div>
+    </div>
+    <div class="login-qr">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="3" height="3"/><rect x="18" y="14" width="3" height="3"/><rect x="14" y="18" width="3" height="3"/><rect x="18" y="18" width="3" height="3"/></svg>
+      Quét mã QR từ thầy giáo
+    </div>
+    <div class="login-foot">Mã học sinh 8 số do thầy cấp khi nhập học<br>Liên hệ: <strong>0987354781</strong></div>
+  </div>
+</div>
+
+<!-- SCREEN: HOME -->
+<div id="screen-home" class="screen">
+  <div class="sbar">
+    <span class="sbar-time" id="clock">9:41</span>
+    <div class="sbar-icons"><span>●●●</span><span>4G</span></div>
+  </div>
+  <div class="hdr">
+    <div class="hdr-logo-row">
+      <div class="hdr-logo">Vật Lý Thầy Hạ Tuấn Anh</div>
+      <div class="hdr-bell" style="position:relative">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div class="notif-dot"></div>
+      </div>
+    </div>
+    <div class="hdr-user">
+      <div class="avatar" id="home-avatar">HS</div>
+      <div>
+        <div class="hdr-name" id="home-name">Học sinh</div>
+        <div class="hdr-sub" id="home-class">Lớp · Đợt 1 · 2025–2026</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll">
+    <!-- Hero card -->
+    <div class="hero-card">
+      <div class="hero-label">Tiến độ học tập đợt 1</div>
+      <div class="hero-progress-wrap">
+        <div class="hero-prog-label">
+          <span id="home-buoi-text">-- / 10 buổi</span>
+          <span id="home-pct-text" style="color:var(--red);font-weight:600">--%</span>
+        </div>
+        <div class="prog-track"><div class="prog-fill" id="home-prog" style="width:0%"></div></div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-stats">
+        <div><div class="hs-num red" id="home-cc">--%</div><div class="hs-lbl">Chuyên cần</div></div>
+        <div><div class="hs-num" id="home-diem">--</div><div class="hs-lbl">Điểm TB</div></div>
+        <div><div class="hs-num green" id="home-hang">Hạng --</div><div class="hs-lbl">Trong lớp</div></div>
+      </div>
+    </div>
+
+    <!-- Quick actions -->
+    <div class="qa-grid">
+      <div class="qa-item" onclick="goTab('attendance')">
+        <div class="qa-icon ic-red"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="qa-lbl">Điểm danh</div>
+      </div>
+      <div class="qa-item" onclick="goTab('scores')">
+        <div class="qa-icon ic-navy"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+        <div class="qa-lbl">Điểm số</div>
+      </div>
+      <div class="qa-item" onclick="goTab('schedule')">
+        <div class="qa-icon ic-green"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        <div class="qa-lbl">Lịch học</div>
+      </div>
+      <div class="qa-item" onclick="goTab('payment')">
+        <div class="qa-icon ic-amber"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+        <div class="qa-lbl">Học phí</div>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="sec-hdr"><span class="sec-title">Thông báo mới nhất</span></div>
+    <div class="card" id="home-notif-list"></div>
+  </div>
+  <div class="bnav">
+    <div class="bn act" onclick="goTab('home')">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Trang chủ</span>
+    </div>
+    <div class="bn" onclick="goTab('attendance')">
+      <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span>Chuyên cần</span>
+    </div>
+    <div class="bn" onclick="goTab('scores')">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span>Điểm số</span>
+    </div>
+    <div class="bn" onclick="goTab('schedule')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>Lịch học</span>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: ATTENDANCE -->
+<div id="screen-attendance" class="screen">
+  <div class="sbar"><span class="sbar-time" id="clock2">9:41</span><div class="sbar-icons"><span>4G</span></div></div>
+  <div class="page-hdr">
+    <div class="page-hdr-top">
+      <div class="back-btn" onclick="goTab('home')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+      <span class="page-title">Chuyên cần</span>
+      <span class="badge bd-green" id="att-cc-badge">--%</span>
+    </div>
+    <div class="page-sub" id="att-sub">Lớp -- · Đợt 1</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px">
+      <div style="background:rgba(255,255,255,.15);border-radius:9px;padding:8px 4px;text-align:center">
+        <div style="font-size:17px;font-weight:700;color:#fff" id="att-comat">--</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.65);margin-top:2px">Có mặt</div>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:9px;padding:8px 4px;text-align:center">
+        <div style="font-size:17px;font-weight:700;color:#FFD0D6" id="att-vang">--</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.65);margin-top:2px">Vắng</div>
+      </div>
+      <div style="background:rgba(255,255,255,.15);border-radius:9px;padding:8px 4px;text-align:center">
+        <div style="font-size:17px;font-weight:700;color:#FFE5A0" id="att-phep">--</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.65);margin-top:2px">Có phép</div>
+      </div>
+      <div style="background:rgba(255,255,255,.22);border-radius:9px;padding:8px 4px;text-align:center">
+        <div style="font-size:17px;font-weight:700;color:#fff" id="att-pct">--%</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.65);margin-top:2px">Chuyên cần</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll">
+    <div class="sec-hdr"><span class="sec-title">Điểm danh 10 buổi</span></div>
+    <div class="card card-pad">
+      <div class="dot-grid" id="att-dots"></div>
+      <div class="dot-legend" style="margin-top:10px">
+        <div class="dot-legend-item"><div class="dot-legend-color" style="background:var(--green-light);border:1px solid #B8DECA"></div>Có mặt</div>
+        <div class="dot-legend-item"><div class="dot-legend-color" style="background:var(--red-light);border:1px solid var(--red-mid)"></div>Vắng</div>
+        <div class="dot-legend-item"><div class="dot-legend-color" style="background:var(--amber-light);border:1px solid #F5D99A"></div>Có phép</div>
+        <div class="dot-legend-item"><div class="dot-legend-color" style="background:var(--gray2);border:1px solid var(--border)"></div>Chưa học</div>
+      </div>
+    </div>
+    <div class="sec-hdr"><span class="sec-title">Nội dung các buổi</span></div>
+    <div class="card" id="att-buoi-list"></div>
+  </div>
+  <div class="bnav">
+    <div class="bn" onclick="goTab('home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Trang chủ</span></div>
+    <div class="bn act" onclick="goTab('attendance')"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Chuyên cần</span></div>
+    <div class="bn" onclick="goTab('scores')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>Điểm số</span></div>
+    <div class="bn" onclick="goTab('schedule')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Lịch học</span></div>
+  </div>
+</div>
+
+<!-- SCREEN: SCORES -->
+<div id="screen-scores" class="screen">
+  <div class="sbar"><span class="sbar-time" id="clock3">9:41</span><div class="sbar-icons"><span>4G</span></div></div>
+  <div class="page-hdr">
+    <div class="page-hdr-top">
+      <div class="back-btn" onclick="goTab('home')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+      <span class="page-title">Kết quả kiểm tra</span>
+      <span class="badge" style="background:rgba(255,255,255,.2);color:#fff;font-size:10px;padding:3px 9px;border-radius:20px" id="scores-rank">Hạng --</span>
+    </div>
+    <div class="page-sub" id="scores-sub">Lớp -- · Đợt 1</div>
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-top:12px">
+      <div>
+        <div style="font-size:11px;color:rgba(255,255,255,.65);margin-bottom:3px">Điểm trung bình</div>
+        <div style="font-size:34px;font-weight:800;color:#fff;line-height:1" id="scores-avg">--<span style="font-size:14px;font-weight:400;color:rgba(255,255,255,.6)"> / 10</span></div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:rgba(255,255,255,.55)" id="scores-chitieu">Chỉ tiêu: --</div>
+        <div style="font-size:11px;color:#FFD0D6;margin-top:3px" id="scores-diff"></div>
+        <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:3px" id="scores-tblop">TB lớp: --</div>
+      </div>
+    </div>
+    <div style="background:rgba(255,255,255,.2);border-radius:3px;height:4px;margin-top:10px;overflow:hidden">
+      <div style="background:#fff;height:100%;border-radius:3px;transition:width .6s" id="scores-prog" style="width:0%"></div>
+    </div>
+  </div>
+  <div class="scroll">
+    <div class="sec-hdr"><span class="sec-title">Điểm từng đề</span></div>
+    <div class="card card-pad">
+      <div class="score-grid" id="scores-grid"></div>
+    </div>
+    <div class="sec-hdr"><span class="sec-title">So sánh với lớp</span></div>
+    <div class="card">
+      <div class="cmp-row" style="padding:12px;margin-top:0">
+        <div class="cmp-cell me"><div class="cmp-n red" id="cmp-me">--</div><div class="cmp-l">Của em</div></div>
+        <div class="cmp-cell"><div class="cmp-n" id="cmp-avg">--</div><div class="cmp-l">TB lớp</div></div>
+        <div class="cmp-cell"><div class="cmp-n green" id="cmp-max">--</div><div class="cmp-l">Cao nhất</div></div>
+      </div>
+    </div>
+    <div class="sec-hdr"><span class="sec-title">Xếp loại</span></div>
+    <div class="card">
+      <div class="li">
+        <div class="li-icon ic-navy"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+        <div class="li-body"><div class="li-title" id="scores-xeploai">Học lực --</div><div class="li-sub" id="scores-ghinhan">--</div></div>
+        <span class="badge bd-navy" id="scores-badge">--</span>
+      </div>
+    </div>
+  </div>
+  <div class="bnav">
+    <div class="bn" onclick="goTab('home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Trang chủ</span></div>
+    <div class="bn" onclick="goTab('attendance')"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Chuyên cần</span></div>
+    <div class="bn act" onclick="goTab('scores')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>Điểm số</span></div>
+    <div class="bn" onclick="goTab('schedule')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Lịch học</span></div>
+  </div>
+</div>
+
+<!-- SCREEN: SCHEDULE -->
+<div id="screen-schedule" class="screen">
+  <div class="sbar"><span class="sbar-time" id="clock4">9:41</span><div class="sbar-icons"><span>4G</span></div></div>
+  <div class="page-hdr">
+    <div class="page-hdr-top">
+      <div class="back-btn" onclick="goTab('home')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+      <span class="page-title">Lịch học & Học phí</span>
+    </div>
+    <div class="page-sub" id="sch-sub">Lớp -- · 2025–2026</div>
+  </div>
+  <div class="scroll">
+    <div class="sec-hdr"><span class="sec-title">Lịch cố định hàng tuần</span></div>
+    <div class="card" id="sch-weekly"></div>
+
+    <div class="sec-hdr"><span class="sec-title">Buổi học sắp tới</span></div>
+    <div class="card" id="sch-upcoming"></div>
+
+    <div class="sec-hdr"><span class="sec-title">Học phí đợt 1</span></div>
+    <div class="card card-pad" id="sch-hocphi"></div>
+  </div>
+  <div class="bnav">
+    <div class="bn" onclick="goTab('home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Trang chủ</span></div>
+    <div class="bn" onclick="goTab('attendance')"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Chuyên cần</span></div>
+    <div class="bn" onclick="goTab('scores')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>Điểm số</span></div>
+    <div class="bn act" onclick="goTab('schedule')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Lịch học</span></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────
+const SHEET_ID = '1BRmcmUXY6BEBCoi_DcLHZpExWRaHzApXtv0DyFdHOwo';
+const API_KEY  = 'fd933e5ee395a1345b148c835b2435e6fb65d57c'; // Thầy điền API Key vào đây
+
+// ── Lịch học cứng theo lớp (từ dữ liệu thực) ───────────────────
+const LICH_MAP = {
+  '10L1':{days:['Thứ 2','Thứ 5'],gio:'14h30–16h30',ca:'Chiều'},
+  '10L2':{days:['Thứ 2'],gio:'19h15–21h00',ca:'Tối'},
+  '10L3':{days:['Thứ 3','CN'],gio:'14h30–16h30',ca:'Chiều'},
+  '10L4':{days:['Thứ 4','CN'],gio:'14h30–16h30',ca:'Chiều'},
+  '11L1':{days:['Thứ 5','Thứ 7','CN'],gio:'17h00–19h00',ca:'Chiều'},
+  '11L2':{days:['Thứ 3','CN'],gio:'19h15–21h00',ca:'Tối'},
+  '11L3':{days:['Thứ 2','Thứ 6'],gio:'17h00–19h00',ca:'Chiều'},
+  '11L4':{days:['–'],gio:'–',ca:'–'},
+  '12L1':{days:['Thứ 4','Thứ 7'],gio:'17h00–19h00',ca:'Chiều'},
+  '12L2':{days:['Thứ 3'],gio:'19h15–21h00',ca:'Tối'},
+  '12L3':{days:['Thứ 5','Thứ 6'],gio:'14h30–16h30',ca:'Chiều'},
+  '12L4':{days:['Thứ 3','Thứ 4'],gio:'17h00–19h00',ca:'Chiều'},
+};
+
+const DAY_SHORT = {'Thứ 2':'T2','Thứ 3':'T3','Thứ 4':'T4','Thứ 5':'T5','Thứ 6':'T6','Thứ 7':'T7','CN':'CN'};
+
+// ── State ────────────────────────────────────────────────────────
+let STATE = {student:null, lop:null, attData:[], scoreData:[], lichData:[], hpData:{}};
+
+// ── Helpers ──────────────────────────────────────────────────────
+function $(id){return document.getElementById(id)}
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+function fmt(n,dec=2){return n!==null&&n!==''&&!isNaN(n)?Number(n).toFixed(dec):null}
+function initials(name){const p=name.trim().split(' ');return p.length>=2?(p[0][0]+p[p.length-1][0]).toUpperCase():name.substring(0,2).toUpperCase()}
+
+function updateClock(){
+  const now=new Date();
+  const t=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  ['clock','clock2','clock3','clock4'].forEach(id=>{const e=$(id);if(e)e.textContent=t});
+}
+updateClock(); setInterval(updateClock,10000);
+
+// ── Navigation ───────────────────────────────────────────────────
+function goTab(tab){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $('screen-'+tab).classList.add('active');
+  document.querySelectorAll('.bnav .bn').forEach(b=>b.classList.remove('act'));
+}
+
+// ── Google Sheets API ────────────────────────────────────────────
+async function sheetsGet(range){
+  const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
+  const r=await fetch(url);
+  if(!r.ok) throw new Error('API error '+r.status);
+  const d=await r.json();
+  return d.values||[];
+}
+
+// ── Login ────────────────────────────────────────────────────────
+async function doLogin(){
+  const id=$('inp-id').value.trim();
+  const lop=$('inp-class').value;
+  if(!id||id.length<6){toast('Nhập mã học sinh 8 số');return;}
+  if(!lop){toast('Chọn lớp học thêm');return;}
+
+  const btn=$('btn-login');
+  btn.textContent='Đang đăng nhập...';
+  btn.disabled=true;
+  $('login-err').style.display='none';
+
+  try{
+    // Demo mode khi chưa có API Key thật
+    if(API_KEY==='REPLACE_WITH_API_KEY'){
+      await demoLogin(id,lop);
+      return;
+    }
+
+    // Đọc CFG_HS
+    const rows=await sheetsGet('CFG_HS!A7:K300');
+    const found=rows.find(r=>r[0]&&r[0].toString().trim()===id&&r[3]&&r[3].toString().trim()===lop);
+    if(!found){
+      $('login-err').style.display='block';
+      btn.textContent='ĐĂNG NHẬP'; btn.disabled=false;
+      return;
+    }
+    STATE.student={id:found[0],name:found[1],gender:found[2],lop:found[3],lopTruong:found[4],nhom:found[5],chiTieu:found[6]?parseFloat(found[6]):null};
+    STATE.lop=lop;
+    await loadAllData();
+    renderAll();
+    goTab('home');
+  }catch(e){
+    console.error(e);
+    toast('Lỗi kết nối. Dùng chế độ demo.');
+    await demoLogin(id,lop);
+  }finally{
+    btn.textContent='ĐĂNG NHẬP'; btn.disabled=false;
+  }
+}
+
+// ── Demo login với dữ liệu mẫu ───────────────────────────────────
+async function demoLogin(id,lop){
+  STATE.student={id,name:'Trần Thế Đan',gender:'Nam',lop,lopTruong:'12L4',nhom:'3',chiTieu:8.5};
+  STATE.lop=lop;
+  STATE.attData=[
+    {buoi:'B01',nd:'Chuyển động thẳng đều – Động lực học',ngay:'08/01/2026',trang:'ok'},
+    {buoi:'B02',nd:'Dao động điều hòa – Con lắc lò xo',ngay:'09/01/2026',trang:'ok'},
+    {buoi:'B03',nd:'Con lắc đơn – Năng lượng dao động',ngay:'15/01/2026',trang:'no'},
+    {buoi:'B04',nd:'Tổng hợp dao động – Làm đề số 1',ngay:'16/01/2026',trang:'ok'},
+    {buoi:'B05',nd:'Sóng cơ học – Phương trình sóng',ngay:'22/01/2026',trang:'ok'},
+    {buoi:'B06',nd:'Giao thoa sóng – Bài tập tổng hợp',ngay:'23/01/2026',trang:'pm'},
+    {buoi:'B07',nd:'Điện xoay chiều – Mạch RLC nối tiếp',ngay:'29/01/2026',trang:'ok'},
+    {buoi:'B08',nd:'Làm đề số 8 – Điện xoay chiều',ngay:'01/03/2026',trang:'ok'},
+  ];
+  STATE.scoreData=[7.5,8.0,7.2,8.5,7.8,7.5,8.2,8.0];
+  STATE.hpData={tong:1500000,trangThai:'Chưa thu',buoi:10,giaBuoi:150000};
+  renderAll();
+  goTab('home');
+  toast('Chế độ xem thử – kết nối API để xem dữ liệu thật');
+}
+
+// ── Load data from Sheets ─────────────────────────────────────────
+async function loadAllData(){
+  const lop=STATE.lop;
+  const id=STATE.student.id;
+  try{
+    // Lịch học
+    const lichRows=await sheetsGet(`LICH_HOC!A7:K200`);
+    STATE.lichData=lichRows.filter(r=>r[0]&&r[0].toString().trim()===lop).map(r=>({
+      lop:r[0],dot:r[1],buoi:r[2],ngay:r[6]||'',ca:r[3]||'',gio:r[4]||'',dahoc:r[5]==='✔',nd:r[7]||'',tl:r[8]||''
+    }));
+    // Điểm danh
+    const ddSheet=`DD.${lop}.D1`;
+    const ddRows=await sheetsGet(`${ddSheet}!A7:Q100`);
+    const studentRow=ddRows.find(r=>r[1]&&r[1].toString().trim()===id);
+    if(studentRow){
+      STATE.attData=[];
+      for(let i=0;i<10;i++){
+        const buoiNd=STATE.lichData[i]||{};
+        const val=studentRow[5+i]||'';
+        STATE.attData.push({
+          buoi:`B${String(i+1).padStart(2,'0')}`,
+          nd:buoiNd.nd||'',
+          ngay:buoiNd.ngay||'',
+          trang:val==='V'?'no':val==='P'?'pm':buoiNd.dahoc?'ok':'nd'
+        });
+      }
+    }
+    // Điểm KT
+    const dkSheet=`DK.${lop}`;
+    const dkRows=await sheetsGet(`${dkSheet}!A5:R100`);
+    const dkRow=dkRows.find(r=>r[1]&&r[1].toString().trim()===id);
+    if(dkRow){STATE.scoreData=dkRow.slice(6,12).map(v=>v&&v!==''?parseFloat(v):null).filter(v=>v!==null);}
+    // Học phí
+    const tcSheet=`TC.${lop}.D1`;
+    const tcRows=await sheetsGet(`${tcSheet}!A8:I100`);
+    const tcRow=tcRows.find(r=>r[1]&&r[1].toString().trim()===id);
+    if(tcRow){STATE.hpData={tong:tcRow[6]?parseInt(tcRow[6].toString().replace(/\D/g,'')):1500000,trangThai:tcRow[7]||'Chưa thu',buoi:parseInt(tcRow[5])||10,giaBuoi:150000};}
+  }catch(e){console.error('Load data error:',e);}
+}
+
+// ── Render ───────────────────────────────────────────────────────
+function renderAll(){
+  const s=STATE.student;
+  if(!s) return;
+  const lop=s.lop;
+  const inits=initials(s.name);
+
+  // HOME
+  $('home-avatar').textContent=inits;
+  $('home-name').textContent=s.name;
+  $('home-class').textContent=`Lớp ${lop} · Đợt 1 · 2025–2026`;
+
+  const done=STATE.attData.filter(a=>a.trang!=='nd').length;
+  const total=10;
+  const pct=Math.round(done/total*100);
+  $('home-buoi-text').textContent=`${done} / ${total} buổi`;
+  $('home-pct-text').textContent=`${pct}%`;
+  $('home-prog').style.width=pct+'%';
+
+  const vang=STATE.attData.filter(a=>a.trang==='no').length;
+  const phep=STATE.attData.filter(a=>a.trang==='pm').length;
+  const ccPct=done>0?Math.round((1-(vang+phep)/done)*100):100;
+  $('home-cc').textContent=ccPct+'%';
+
+  const scores=STATE.scoreData.filter(v=>v!==null);
+  const avg=scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:null;
+  $('home-diem').textContent=avg?avg.toFixed(1):'--';
+  $('home-hang').textContent='Hạng 4'; // placeholder
+
+  // Notifications
+  const notifs=[];
+  if(STATE.hpData.trangThai&&STATE.hpData.trangThai.includes('Chưa')){
+    notifs.push({icon:'amber',title:'Học phí đợt 1 chưa nộp',sub:`${(STATE.hpData.tong||1500000).toLocaleString('vi')}đ`,badge:'bd-amber',badgeTxt:'Chưa nộp'});
+  }
+  const lastDone=STATE.attData.filter(a=>a.trang==='ok'||a.trang==='pm').pop();
+  if(lastDone) notifs.push({icon:'green',title:`Đã học ${lastDone.buoi}`,sub:lastDone.nd||'',badge:'bd-green',badgeTxt:'Đã học'});
+  const upcoming=STATE.lichData.filter(l=>!l.dahoc)[0];
+  if(upcoming) notifs.push({icon:'navy',title:`Buổi tới – ${upcoming.buoi}`,sub:upcoming.ngay?`${upcoming.ngay} · ${upcoming.gio}`:`${upcoming.gio}`,badge:'bd-navy',badgeTxt:'Sắp tới'});
+
+  const iconSVGs={
+    amber:'<svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',
+    green:'<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
+    navy:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'
+  };
+  $('home-notif-list').innerHTML=notifs.map(n=>`
+    <div class="li">
+      <div class="li-icon ic-${n.icon}">${iconSVGs[n.icon]}</div>
+      <div class="li-body"><div class="li-title">${n.title}</div><div class="li-sub">${n.sub}</div></div>
+      <span class="badge ${n.badge}">${n.badgeTxt}</span>
+    </div>`).join('');
+
+  renderAttendance();
+  renderScores();
+  renderSchedule();
+}
+
+function renderAttendance(){
+  const s=STATE.student;
+  const att=STATE.attData;
+  const done=att.filter(a=>a.trang!=='nd').length;
+  const vang=att.filter(a=>a.trang==='no').length;
+  const phep=att.filter(a=>a.trang==='pm').length;
+  const comat=done-vang-phep;
+  const cc=done>0?Math.round((1-(vang+phep)/done)*100):100;
+
+  $('att-sub').textContent=`Lớp ${s.lop} · Đợt 1`;
+  $('att-cc-badge').textContent=cc+'%';
+  $('att-comat').textContent=comat;
+  $('att-vang').textContent=vang;
+  $('att-phep').textContent=phep;
+  $('att-pct').textContent=cc+'%';
+
+  const allDots=[];
+  for(let i=0;i<10;i++){
+    const a=att[i]||{buoi:`B${String(i+1).padStart(2,'0')}`,trang:'nd'};
+    const cls=a.trang==='ok'?'d-ok':a.trang==='no'?'d-no':a.trang==='pm'?'d-pm':'d-nd';
+    allDots.push(`<div class="dot ${cls}">${a.buoi}</div>`);
+  }
+  $('att-dots').innerHTML=allDots.join('');
+
+  const doneBuois=att.filter(a=>a.trang!=='nd').slice(-4).reverse();
+  $('att-buoi-list').innerHTML=doneBuois.map(a=>{
+    const bdCls=a.trang==='ok'?'bd-green':a.trang==='no'?'bd-red':'bd-amber';
+    const bdTxt=a.trang==='ok'?'Có mặt':a.trang==='no'?'Vắng':'Có phép';
+    return `<div class="li">
+      <div class="li-icon ${a.trang==='ok'?'ic-green':a.trang==='no'?'ic-red':'ic-amber'}">
+        <svg viewBox="0 0 24 24">${a.trang==='ok'?'<polyline points="20 6 9 17 4 12"/>':a.trang==='no'?'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>':'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'}</svg>
+      </div>
+      <div class="li-body"><div class="li-title">${a.buoi} · ${a.nd||'–'}</div><div class="li-sub">${a.ngay||''}</div></div>
+      <span class="badge ${bdCls}">${bdTxt}</span>
+    </div>`;
+  }).join('')||'<div style="padding:16px;text-align:center;font-size:13px;color:var(--text3)">Chưa có dữ liệu điểm danh</div>';
+}
+
+function renderScores(){
+  const s=STATE.student;
+  const scores=STATE.scoreData.filter(v=>v!==null);
+  const avg=scores.length?scores.reduce((a,b)=>a+b,0)/scores.length:null;
+  const chiTieu=s.chiTieu||8.5;
+
+  $('scores-sub').textContent=`Lớp ${s.lop} · Đợt 1`;
+  $('scores-avg').innerHTML=avg?avg.toFixed(1)+'<span style="font-size:14px;font-weight:400;color:rgba(255,255,255,.6)"> / 10</span>':'--';
+  $('scores-chitieu').textContent=`Chỉ tiêu: ${chiTieu}`;
+  $('scores-prog').style.width=avg?Math.min(avg/10*100,100)+'%':'0%';
+
+  if(avg!==null){
+    const diff=avg-chiTieu;
+    if(diff<0){$('scores-diff').textContent=`Còn thiếu ${Math.abs(diff).toFixed(1)} điểm`;$('scores-diff').style.color='#FFD0D6';}
+    else{$('scores-diff').textContent=`Vượt chỉ tiêu +${diff.toFixed(1)}`;$('scores-diff').style.color='#A8F0C6';}
+  }
+  $('scores-tblop').textContent='TB lớp: 7.4';
+  $('scores-rank').textContent='Hạng 4/12';
+
+  $('scores-grid').innerHTML=scores.map((v,i)=>{
+    const isLast=(i===scores.length-1);
+    return `<div class="sc${isLast?' hi':''}"><div class="sc-n${isLast?' hi':''}">${v.toFixed(1)}</div><div class="sc-l">Đề ${String(i+1).padStart(2,'0')}</div></div>`;
+  }).join('')||'<div style="grid-column:1/-1;text-align:center;font-size:13px;color:var(--text3);padding:12px">Chưa có điểm</div>';
+
+  $('cmp-me').textContent=avg?avg.toFixed(1):'--';
+  $('cmp-avg').textContent='7.4';
+  $('cmp-max').textContent='9.2';
+
+  const xl=avg===null?'Chưa có điểm':avg>=9?'Xuất sắc':avg>=8?'Giỏi':avg>=6.5?'Khá':avg>=5?'Trung bình':'Yếu';
+  const xlNote=avg===null?'Chưa có dữ liệu điểm':avg>=8?`Duy trì tốt, tiến tới xuất sắc`:avg>=6.5?`Cần thêm ${(8-avg).toFixed(1)} điểm để đạt Giỏi`:'Cần cố gắng nhiều hơn';
+  $('scores-xeploai').textContent=`Học lực ${xl}`;
+  $('scores-ghinhan').textContent=xlNote;
+  $('scores-badge').textContent=xl;
+}
+
+function renderSchedule(){
+  const s=STATE.student;
+  const lop=s.lop;
+  const lich=LICH_MAP[lop]||{days:['–'],gio:'–',ca:'–'};
+  $('sch-sub').textContent=`Lớp ${lop} · 2025–2026`;
+
+  // Weekly
+  $('sch-weekly').innerHTML=lich.days.map((d,i)=>`
+    <div class="li">
+      <div class="day-box ${i===0?'red':'navy'}">
+        <div class="day-thu">THỨ</div>
+        <div class="day-num">${DAY_SHORT[d]||d}</div>
+      </div>
+      <div class="li-body">
+        <div class="li-title">${d} hàng tuần</div>
+        <div class="li-sub">${lich.gio} · ${lich.ca}</div>
+      </div>
+    </div>`).join('');
+
+  // Upcoming
+  const upcoming=STATE.lichData.filter(l=>!l.dahoc).slice(0,3);
+  if(upcoming.length){
+    $('sch-upcoming').innerHTML=upcoming.map((l,i)=>`
+      <div class="li" style="${i===0?'background:var(--red-light);':''}">
+        <div class="day-box ${i===0?'red':'gray'}">
+          <div class="day-thu" style="${i===0?'':'color:var(--text3)'}">B</div>
+          <div class="day-num" style="${i===0?'':'color:var(--text2)'}">${l.buoi?l.buoi.replace('B',''):'--'}</div>
+        </div>
+        <div class="li-body">
+          <div class="li-title">Buổi ${l.buoi||'--'}</div>
+          <div class="li-sub">${l.ngay||'Chưa có lịch'} · ${l.gio||lich.gio}</div>
+        </div>
+        ${i===0?'<span class="badge bd-red">Sắp tới</span>':'<span class="badge bd-gray">Sắp tới</span>'}
+      </div>`).join('');
+  } else {
+    $('sch-upcoming').innerHTML='<div style="padding:14px;text-align:center;font-size:13px;color:var(--text3)">Chưa có lịch buổi tiếp theo</div>';
+  }
+
+  // HP
+  const hp=STATE.hpData;
+  const trangThai=hp.trangThai||'Chưa thu';
+  const isPaid=trangThai==='Đã thu';
+  $('sch-hocphi').innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+      <div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Tổng học phí phải nộp</div>
+        <div style="font-size:22px;font-weight:800;color:var(--red)">${(hp.tong||1500000).toLocaleString('vi')}đ</div>
+      </div>
+      <span class="badge ${isPaid?'bd-green':'bd-amber'}">${trangThai}</span>
+    </div>
+    <div class="hp-info-row"><span class="hp-key">Học phí / buổi</span><span class="hp-val">${(hp.giaBuoi||150000).toLocaleString('vi')}đ</span></div>
+    <div class="hp-info-row"><span class="hp-key">Số buổi đợt 1</span><span class="hp-val">${hp.buoi||10} buổi</span></div>
+    <div class="hp-info-row"><span class="hp-key">Tình trạng</span><span class="hp-val" style="color:${isPaid?'var(--green)':'var(--red)'}">${trangThai}</span></div>
+    <div class="hp-info-row" style="border:none"><span class="hp-key">Liên hệ nộp</span><span class="hp-val" style="color:var(--navy)">Trưởng nhóm / Thầy HTA</span></div>`;
+}
+
+// ── Event listeners ──────────────────────────────────────────────
+$('btn-login').addEventListener('click', doLogin);
+$('inp-id').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+
+// ── Init: ẩn loading sau 1.5s ────────────────────────────────────
+setTimeout(()=>{
+  const l=$('loading');
+  l.style.transition='opacity .4s';
+  l.style.opacity='0';
+  setTimeout(()=>l.style.display='none', 400);
+}, 1500);
+</script>
+</body>
+</html>
