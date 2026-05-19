@@ -240,40 +240,56 @@ html,body{height:100%;overflow:hidden;font-family:'Be Vietnam Pro',sans-serif;ba
     <div class="login-app-sub">Theo dõi kết quả học tập<br>Lịch học · Điểm số · Chuyên cần</div>
   </div>
   <div class="login-form">
-    <div id="login-err" class="login-err">Không tìm thấy học sinh. Kiểm tra lại mã.</div>
-    <label class="login-lbl">Mã học sinh (8 số)</label>
-    <div class="login-inp-wrap">
-      <input class="login-inp" id="inp-id" type="tel" maxlength="8" placeholder="20080001" autocomplete="off">
+    <!-- Tab switcher -->
+    <div style="display:flex;border-bottom:1.5px solid #E8E9EC;margin-bottom:16px">
+      <div id="tab-sdt" onclick="switchLoginTab('sdt')" style="flex:1;padding:10px 4px;text-align:center;font-size:12px;font-weight:700;color:#C8102E;border-bottom:2px solid #C8102E;cursor:pointer">SĐT phụ huynh</div>
+      <div id="tab-ma" onclick="switchLoginTab('ma')" style="flex:1;padding:10px 4px;text-align:center;font-size:12px;font-weight:600;color:#aaa;border-bottom:2px solid transparent;cursor:pointer">Mã học sinh</div>
     </div>
-    <label class="login-lbl">Lớp học thêm</label>
-    <div class="login-inp-wrap">
-      <select class="login-inp" id="inp-class" style="appearance:none;cursor:pointer">
-        <option value="">-- Chọn lớp --</option>
-        <option value="10L1">10L1</option>
-        <option value="10L2">10L2</option>
-        <option value="10L3">10L3</option>
-        <option value="10L4">10L4</option>
-        <option value="11L1">11L1</option>
-        <option value="11L2">11L2</option>
-        <option value="11L3">11L3</option>
-        <option value="11L4">11L4</option>
-        <option value="12L1">12L1</option>
-        <option value="12L2">12L2</option>
-        <option value="12L3">12L3</option>
-        <option value="12L4">12L4</option>
-      </select>
+
+    <div id="login-err" class="login-err">Không tìm thấy. Kiểm tra lại thông tin.</div>
+
+    <!-- Tab SĐT -->
+    <div id="panel-sdt">
+      <label class="login-lbl">Số điện thoại phụ huynh</label>
+      <div class="login-inp-wrap">
+        <input class="login-inp" id="inp-sdt" type="tel" maxlength="11" placeholder="0987xxxxxx" autocomplete="off">
+      </div>
+      <label class="login-lbl">Lớp học thêm</label>
+      <div class="login-inp-wrap">
+        <select class="login-inp" id="inp-class-sdt" style="appearance:none;cursor:pointer">
+          <option value="">-- Chọn lớp --</option>
+          <option value="10L1">10L1</option><option value="10L2">10L2</option>
+          <option value="10L3">10L3</option><option value="10L4">10L4</option>
+          <option value="11L1">11L1</option><option value="11L2">11L2</option>
+          <option value="11L3">11L3</option><option value="11L4">11L4</option>
+          <option value="12L1">12L1</option><option value="12L2">12L2</option>
+          <option value="12L3">12L3</option><option value="12L4">12L4</option>
+        </select>
+      </div>
     </div>
+
+    <!-- Tab Mã học sinh -->
+    <div id="panel-ma" style="display:none">
+      <label class="login-lbl">Mã học sinh (8 số)</label>
+      <div class="login-inp-wrap">
+        <input class="login-inp" id="inp-id" type="tel" maxlength="8" placeholder="20080001" autocomplete="off">
+      </div>
+      <label class="login-lbl">Lớp học thêm</label>
+      <div class="login-inp-wrap">
+        <select class="login-inp" id="inp-class" style="appearance:none;cursor:pointer">
+          <option value="">-- Chọn lớp --</option>
+          <option value="10L1">10L1</option><option value="10L2">10L2</option>
+          <option value="10L3">10L3</option><option value="10L4">10L4</option>
+          <option value="11L1">11L1</option><option value="11L2">11L2</option>
+          <option value="11L3">11L3</option><option value="11L4">11L4</option>
+          <option value="12L1">12L1</option><option value="12L2">12L2</option>
+          <option value="12L3">12L3</option><option value="12L4">12L4</option>
+        </select>
+      </div>
+    </div>
+
     <button class="login-btn" id="btn-login">ĐĂNG NHẬP</button>
-    <div class="login-divider">
-      <div class="login-divider-line"></div>
-      <span class="login-divider-txt">hoặc</span>
-      <div class="login-divider-line"></div>
-    </div>
-    <div class="login-qr">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="3" height="3"/><rect x="18" y="14" width="3" height="3"/><rect x="14" y="18" width="3" height="3"/><rect x="18" y="18" width="3" height="3"/></svg>
-      Quét mã QR từ thầy giáo
-    </div>
-    <div class="login-foot">Mã học sinh 8 số do thầy cấp khi nhập học<br>Liên hệ: <strong>0987354781</strong></div>
+    <div class="login-foot">SĐT phụ huynh hoặc mã 8 số do thầy cấp<br>Liên hệ: <strong>0987354781</strong></div>
   </div>
 </div>
 
@@ -332,7 +348,7 @@ html,body{height:100%;overflow:hidden;font-family:'Be Vietnam Pro',sans-serif;ba
         <div class="qa-icon ic-green"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
         <div class="qa-lbl">Lịch học</div>
       </div>
-      <div class="qa-item" onclick="goTab('payment')">
+      <div class="qa-item" onclick="goToHocPhi()">
         <div class="qa-icon ic-amber"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
         <div class="qa-lbl">Học phí</div>
       </div>
@@ -557,40 +573,45 @@ async function sheetsGet(range){
 
 // ── Login ────────────────────────────────────────────────────────
 async function doLogin(){
-  const id=$('inp-id').value.trim();
-  const lop=$('inp-class').value;
-  if(!id||id.length<6){toast('Nhập mã học sinh 8 số');return;}
-  if(!lop){toast('Chọn lớp học thêm');return;}
-
   const btn=$('btn-login');
   btn.textContent='Đang đăng nhập...';
   btn.disabled=true;
   $('login-err').style.display='none';
 
   try{
-    // Demo mode khi chưa có API Key thật
-    if(API_KEY==='REPLACE_WITH_API_KEY'){
-      await demoLogin(id,lop);
-      return;
+    if(loginMode==='sdt'){
+      const sdt=$('inp-sdt').value.trim().replace(/\D/g,'');
+      const lop=$('inp-class-sdt').value;
+      if(!sdt||sdt.length<9){toast('Nhập số điện thoại phụ huynh');btn.textContent='ĐĂNG NHẬP';btn.disabled=false;return;}
+      if(!lop){toast('Chọn lớp học thêm');btn.textContent='ĐĂNG NHẬP';btn.disabled=false;return;}
+      const rows=await sheetsGet('CFG_HS!A7:L300');
+      // Cột H = index 7 là SĐT phụ huynh, cột D = index 3 là lớp
+      const found=rows.find(r=>{
+        const rowSdt=(r[7]||'').toString().replace(/\D/g,'');
+        const rowLop=(r[3]||'').toString().trim();
+        return (rowSdt===sdt||rowSdt==='0'+sdt||('0'+rowSdt)===sdt) && rowLop===lop;
+      });
+      if(!found){$('login-err').style.display='block';btn.textContent='ĐĂNG NHẬP';btn.disabled=false;return;}
+      STATE.student={id:found[0],name:found[1],gender:found[2],lop:found[3],lopTruong:found[4],nhom:found[5],chiTieu:found[6]?parseFloat(found[6]):null,sdt:found[7]};
+      STATE.lop=lop;
+    } else {
+      const id=$('inp-id').value.trim();
+      const lop=$('inp-class').value;
+      if(!id||id.length<6){toast('Nhập mã học sinh 8 số');btn.textContent='ĐĂNG NHẬP';btn.disabled=false;return;}
+      if(!lop){toast('Chọn lớp học thêm');btn.textContent='ĐĂNG NHẬP';btn.disabled=false;return;}
+      const rows=await sheetsGet('CFG_HS!A7:K300');
+      const found=rows.find(r=>r[0]&&r[0].toString().trim()===id&&r[3]&&r[3].toString().trim()===lop);
+      if(!found){$('login-err').style.display='block';btn.textContent='ĐĂNG NHẬP';btn.disabled=false;return;}
+      STATE.student={id:found[0],name:found[1],gender:found[2],lop:found[3],lopTruong:found[4],nhom:found[5],chiTieu:found[6]?parseFloat(found[6]):null};
+      STATE.lop=lop;
     }
-
-    // Đọc CFG_HS
-    const rows=await sheetsGet('CFG_HS!A7:K300');
-    const found=rows.find(r=>r[0]&&r[0].toString().trim()===id&&r[3]&&r[3].toString().trim()===lop);
-    if(!found){
-      $('login-err').style.display='block';
-      btn.textContent='ĐĂNG NHẬP'; btn.disabled=false;
-      return;
-    }
-    STATE.student={id:found[0],name:found[1],gender:found[2],lop:found[3],lopTruong:found[4],nhom:found[5],chiTieu:found[6]?parseFloat(found[6]):null};
-    STATE.lop=lop;
     await loadAllData();
     renderAll();
     goTab('home');
   }catch(e){
     console.error(e);
-    toast('Lỗi kết nối. Dùng chế độ demo.');
-    await demoLogin(id,lop);
+    $('login-err').textContent='Lỗi kết nối. Vui lòng thử lại.';
+    $('login-err').style.display='block';
   }finally{
     btn.textContent='ĐĂNG NHẬP'; btn.disabled=false;
   }
@@ -840,6 +861,28 @@ function renderSchedule(){
     <div class="hp-info-row"><span class="hp-key">Số buổi đợt 1</span><span class="hp-val">${hp.buoi||10} buổi</span></div>
     <div class="hp-info-row"><span class="hp-key">Tình trạng</span><span class="hp-val" style="color:${isPaid?'var(--green)':'var(--red)'}">${trangThai}</span></div>
     <div class="hp-info-row" style="border:none"><span class="hp-key">Liên hệ nộp</span><span class="hp-val" style="color:var(--navy)">Trưởng nhóm / Thầy HTA</span></div>`;
+}
+
+// ── Học phí quick action ──────────────────────────────────────────
+function goToHocPhi(){
+  goTab('schedule');
+  setTimeout(()=>{
+    const el=$('sch-hocphi');
+    if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+  },300);
+}
+
+// ── Login tab switcher ────────────────────────────────────────────
+let loginMode='sdt';
+function switchLoginTab(mode){
+  loginMode=mode;
+  $('panel-sdt').style.display=mode==='sdt'?'block':'none';
+  $('panel-ma').style.display=mode==='ma'?'block':'none';
+  $('tab-sdt').style.color=mode==='sdt'?'#C8102E':'#aaa';
+  $('tab-sdt').style.borderBottomColor=mode==='sdt'?'#C8102E':'transparent';
+  $('tab-ma').style.color=mode==='ma'?'#C8102E':'#aaa';
+  $('tab-ma').style.borderBottomColor=mode==='ma'?'#C8102E':'transparent';
+  $('login-err').style.display='none';
 }
 
 // ── Event listeners ──────────────────────────────────────────────
