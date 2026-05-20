@@ -1183,22 +1183,6 @@ function renderTailieu(){
   }).join('');
 }
 
-// ── CHUYỂN KHOẢN VIETQR ──────────────────────────────────────
-function openBankTransfer(){
-  const s=S.student;
-  const hp=S.hpData;
-  const amount=hp.tong||0;
-  const name=s?s.name.split(' ').pop():'HS';
-  const lop=S.lop||'';
-  // Nội dung chuyển khoản
-  const desc=encodeURIComponent(`HTA ${lop} ${name}`);
-  // VietQR deep link — mở app ngân hàng, hiện danh sách để chọn
-  const vietqrUrl=`https://dl.vietqr.io/pay?app=&ba=8813866381&bn=BIDV&tn=${desc}&am=${amount}`;
-  window.open(vietqrUrl,'_blank');
-}
-
-// ── CHUYỂN KHOẢN VIETQR ──────────────────────────────────────
-
 // ── BÁO NGHỈ QUA ZALO ────────────────────────────────────────
 async function submitReport(){
   const buoi=$('rpt-buoi').value;
