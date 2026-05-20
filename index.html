@@ -1219,16 +1219,11 @@ setTimeout(()=>{
 },1400);
 // Chỗ dán logic xử lý chọn ngân hàng và gọi app
 const BANKS = [
-  // 4 Ngân hàng đầu tiên 
-  { id: 'agribank', name: 'Agribank', logo: 'https://api.vietqr.io/img/AGRIBANK.png' },
+  { id: 'vba', name: 'Agribank', logo: 'https://api.vietqr.io/img/VBA.png' }, // Đã fix lỗi Agribank
   { id: 'vietinbank', name: 'VietinBank', logo: 'https://api.vietqr.io/img/ICB.png' },
   { id: 'mb', name: 'MB Bank', logo: 'https://api.vietqr.io/img/MB.png' },
   { id: 'bidv', name: 'BIDV', logo: 'https://api.vietqr.io/img/BIDV.png' },
-  
-  // Viettel Money
   { id: 'viettelmoney', name: 'Viettel Money', logo: 'https://api.vietqr.io/img/VIETTELMONEY.png' },
-
-  // Các ngân hàng phổ biến khác
   { id: 'vcb', name: 'Vietcombank', logo: 'https://api.vietqr.io/img/VCB.png' },
   { id: 'tcb', name: 'Techcombank', logo: 'https://api.vietqr.io/img/TCB.png' },
   { id: 'acb', name: 'ACB', logo: 'https://api.vietqr.io/img/ACB.png' },
@@ -1253,15 +1248,22 @@ function openBankTransfer() {
 function confirmBank(appId) {
   const s = S.student;
   const hp = S.hpData;
-  const amount = hp.tong || 0;
+  
+  // Ép số tiền về số nguyên tròn trịa, không có phẩy/chữ để app ngân hàng không bị lỗi
+  const amount = hp.tong ? Math.round(hp.tong) : 0; 
   const name = s ? s.name.split(' ').pop() : 'HS';
   const lop = S.lop || '';
-  const desc = encodeURIComponent(`HTA ${lop} ${name}`);
-
-  const url = `https://dl.vietqr.io/pay?app=${appId}&ba=8813866381&bn=BIDV&tn=${desc}&am=${amount}`;
   
-  // Copy sẵn nội dung đề phòng app lỗi không tự điền nội dung
-  navigator.clipboard.writeText(`HTA ${lop} ${s ? s.name : ''}`).catch(() => {});
+  const rawDesc = `HTA ${lop} ${name}`;
+  const desc = encodeURIComponent(rawDesc);
+
+  // ĐÃ FIX: Đổi bn=BIDV thành bn=970418 (Mã định danh của BIDV). 
+  // Code này giúp các bank app nhận diện chuẩn và nhả đúng số tiền + nội dung.
+  const url = `https://dl.vietqr.io/pay?app=${appId}&ba=8813866381&bn=970418&tn=${desc}&am=${amount}`;
+  
+  // Tao vẫn để tính năng Copy Ngầm phòng hờ.
+  // Nếu có phụ huynh dùng app ngân hàng cùi bắp chặn auto-fill, họ chỉ cần ấn "Dán" (Paste) là xong.
+  navigator.clipboard.writeText(rawDesc).catch(() => {});
 
   document.getElementById('bank-modal').style.display = 'none';
   window.location.href = url;
