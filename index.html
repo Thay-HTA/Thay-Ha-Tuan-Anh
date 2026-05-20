@@ -1249,7 +1249,7 @@ function confirmBank(appId) {
   const s = S.student;
   const hp = S.hpData;
   
-  // Ép số tiền về số nguyên tròn trịa, không có phẩy/chữ để app ngân hàng không bị lỗi
+  // Ép số tiền về số nguyên (Math.round) để tránh lỗi format khi truyền vào app
   const amount = hp.tong ? Math.round(hp.tong) : 0; 
   const name = s ? s.name.split(' ').pop() : 'HS';
   const lop = S.lop || '';
@@ -1257,15 +1257,17 @@ function confirmBank(appId) {
   const rawDesc = `HTA ${lop} ${name}`;
   const desc = encodeURIComponent(rawDesc);
 
-  // ĐÃ FIX: Đổi bn=BIDV thành bn=970418 (Mã định danh của BIDV). 
-  // Code này giúp các bank app nhận diện chuẩn và nhả đúng số tiền + nội dung.
-  const url = `https://dl.vietqr.io/pay?app=${appId}&ba=8813866381&bn=970418&tn=${desc}&am=${amount}`;
+  // ĐÃ FIX LỖI Ở ĐÂY:
+  // - ba: Phải là [STK]@[Mã_Ngân_Hàng] => 8813866381@bidv
+  // - bn: Tên người thụ hưởng => HA TUAN ANH
+  const url = `https://dl.vietqr.io/pay?app=${appId}&ba=8813866381@bidv&bn=HA%20TUAN%20ANH&tn=${desc}&am=${amount}`;
   
-  // Tao vẫn để tính năng Copy Ngầm phòng hờ.
-  // Nếu có phụ huynh dùng app ngân hàng cùi bắp chặn auto-fill, họ chỉ cần ấn "Dán" (Paste) là xong.
+  // Vẫn giữ copy ngầm làm phương án backup
   navigator.clipboard.writeText(rawDesc).catch(() => {});
 
   document.getElementById('bank-modal').style.display = 'none';
+  
+  // Nhảy app với đầy đủ payload chuẩn xác
   window.location.href = url;
 }
 </script>
