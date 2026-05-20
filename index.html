@@ -1219,12 +1219,21 @@ setTimeout(()=>{
 },1400);
 // Chỗ dán logic xử lý chọn ngân hàng và gọi app
 const BANKS = [
-  { id: 'mb', name: 'MB Bank', logo: 'https://api.vietqr.io/img/MB.png' },
-  { id: 'vcb', name: 'Vietcombank', logo: 'https://api.vietqr.io/img/VCB.png' },
-  { id: 'bidv', name: 'BIDV', logo: 'https://api.vietqr.io/img/BIDV.png' },
-  { id: 'tcb', name: 'Techcombank', logo: 'https://api.vietqr.io/img/TCB.png' },
+  // 4 Ngân hàng đầu tiên 
+  { id: 'agribank', name: 'Agribank', logo: 'https://api.vietqr.io/img/AGRIBANK.png' },
   { id: 'vietinbank', name: 'VietinBank', logo: 'https://api.vietqr.io/img/ICB.png' },
-  { id: 'acb', name: 'ACB', logo: 'https://api.vietqr.io/img/ACB.png' }
+  { id: 'mb', name: 'MB Bank', logo: 'https://api.vietqr.io/img/MB.png' },
+  { id: 'bidv', name: 'BIDV', logo: 'https://api.vietqr.io/img/BIDV.png' },
+  
+  // Viettel Money
+  { id: 'viettelmoney', name: 'Viettel Money', logo: 'https://api.vietqr.io/img/VIETTELMONEY.png' },
+
+  // Các ngân hàng phổ biến khác
+  { id: 'vcb', name: 'Vietcombank', logo: 'https://api.vietqr.io/img/VCB.png' },
+  { id: 'tcb', name: 'Techcombank', logo: 'https://api.vietqr.io/img/TCB.png' },
+  { id: 'acb', name: 'ACB', logo: 'https://api.vietqr.io/img/ACB.png' },
+  { id: 'vpb', name: 'VPBank', logo: 'https://api.vietqr.io/img/VPB.png' },
+  { id: 'sacombank', name: 'Sacombank', logo: 'https://api.vietqr.io/img/STB.png' }
 ];
 
 function openBankTransfer() {
