@@ -1198,51 +1198,6 @@ function openBankTransfer(){
 }
 
 // ── CHUYỂN KHOẢN VIETQR ──────────────────────────────────────
-function openBankTransfer(){
-  const s = S.student;
-  const hp = S.hpData;
-  const amount = hp.tong || 0;
-  const name = s ? s.name.split(' ').pop() : 'HS';
-  const lop = S.lop || '';
-  
-  // 1. Tạo nội dung và encode cho URL
-  const rawDesc = `HTA ${lop} ${name}`;
-  const desc = encodeURIComponent(rawDesc);
-  
-  // URL Deep link VietQR
-  const vietqrUrl = `https://dl.vietqr.io/pay?app=&ba=8813866381&bn=BIDV&tn=${desc}&am=${amount}`;
-  
-  // 2. Trick: Copy sẵn thông tin vào Clipboard làm phương án dự phòng
-  const copyText = `STK: 8813866381\nBIDV\nSố tiền: ${amount}\nNội dung: ${rawDesc}`;
-  navigator.clipboard.writeText(copyText).catch(e => console.log('Không hỗ trợ copy ngầm', e));
-
-  // 3. Hiệu ứng nút bấm
-  const btn = $('btn-transfer');
-  const oldHtml = btn.innerHTML;
-  btn.innerHTML = '🔄 Đang mở app Ngân hàng...';
-  
-  // 4. BẮT BUỘC dùng window.location.href để vượt mặt In-app Browser của Zalo
-  window.location.href = vietqrUrl;
-
-  // Trả lại nút sau 3 giây (nếu user back lại web)
-  setTimeout(() => {
-      btn.innerHTML = oldHtml;
-  }, 3000);
-}
-
-function copyTransferNote(){
-  const s=S.student;
-  const lop=S.lop||'';
-  const name=s?s.name:'';
-  const note=`HTA ${lop} ${name}`;
-  navigator.clipboard.writeText(note).then(()=>toast('Đã sao chép nội dung chuyển khoản!')).catch(()=>{
-    // Fallback
-    const el=document.createElement('textarea');
-    el.value=note;document.body.appendChild(el);el.select();
-    document.execCommand('copy');document.body.removeChild(el);
-    toast('Đã sao chép!');
-  });
-}
 
 // ── BÁO NGHỈ QUA ZALO ────────────────────────────────────────
 async function submitReport(){
@@ -1278,6 +1233,61 @@ setTimeout(()=>{
   const l=$('load');l.style.opacity='0';
   setTimeout(()=>{l.style.display='none';loadSaved()},400);
 },1400);
+// Chỗ dán logic xử lý chọn ngân hàng và gọi app
+const BANKS = [
+  { id: 'mb', name: 'MB Bank', logo: 'https://api.vietqr.io/img/MB.png' },
+  { id: 'vcb', name: 'Vietcombank', logo: 'https://api.vietqr.io/img/VCB.png' },
+  { id: 'bidv', name: 'BIDV', logo: 'https://api.vietqr.io/img/BIDV.png' },
+  { id: 'tcb', name: 'Techcombank', logo: 'https://api.vietqr.io/img/TCB.png' },
+  { id: 'vietinbank', name: 'VietinBank', logo: 'https://api.vietqr.io/img/ICB.png' },
+  { id: 'acb', name: 'ACB', logo: 'https://api.vietqr.io/img/ACB.png' }
+];
+
+function openBankTransfer() {
+  const modal = document.getElementById('bank-modal');
+  const grid = document.getElementById('bank-grid');
+  
+  grid.innerHTML = BANKS.map(b => `
+    <div class="bank-item" onclick="confirmBank('${b.id}')">
+      <img src="${b.logo}" alt="${b.name}">
+      <span>${b.name}</span>
+    </div>
+  `).join('');
+  
+  modal.style.display = 'flex';
+}
+
+function confirmBank(appId) {
+  const s = S.student;
+  const hp = S.hpData;
+  const amount = hp.tong || 0;
+  const name = s ? s.name.split(' ').pop() : 'HS';
+  const lop = S.lop || '';
+  const desc = encodeURIComponent(`HTA ${lop} ${name}`);
+
+  const url = `https://dl.vietqr.io/pay?app=${appId}&ba=8813866381&bn=BIDV&tn=${desc}&am=${amount}`;
+  
+  // Copy sẵn nội dung đề phòng app lỗi không tự điền nội dung
+  navigator.clipboard.writeText(`HTA ${lop} ${s ? s.name : ''}`).catch(() => {});
+
+  document.getElementById('bank-modal').style.display = 'none';
+  window.location.href = url;
+}
 </script>
+<div id="bank-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:10000; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:#fff; width:100%; max-width:360px; border-radius:20px; overflow:hidden; animation: slideUp 0.3s ease-out;">
+    <div style="padding:16px; background:var(--red); color:#fff; text-align:center; font-weight:700;">CHỌN NGÂN HÀNG CỦA BẠN</div>
+    <div style="padding:15px; display:grid; grid-template-columns:repeat(3,1fr); gap:12px;" id="bank-grid"></div>
+    <button onclick="document.getElementById('bank-modal').style.display='none'" style="width:100%; padding:15px; border:none; background:#f2f3f7; color:var(--text2); font-weight:600; cursor:pointer;">ĐÓNG</button>
+  </div>
+</div>
+
+<style>
+@keyframes slideUp { from { transform:translateY(50px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+.bank-item { display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; padding:8px; border-radius:12px; border:1px solid #eee; transition:0.2s; }
+.bank-item:active { background:#fde8ec; border-color:var(--red-m); transform:scale(0.95); }
+.bank-item img { width:40px; height:40px; border-radius:8px; object-fit:contain; }
+.bank-item span { font-size:10px; font-weight:600; color:var(--text); text-align:center; }
+</style>
 </body>
 </html>
