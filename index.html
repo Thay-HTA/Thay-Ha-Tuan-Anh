@@ -1224,10 +1224,7 @@ async function submitReport(){
   const lop=S.lop||'';
 
   // Tạo nội dung tin nhắn Zalo
-  const msg=`[BÁO NGHỈ] ${name} - Lớp ${lop}
-Buổi: ${buoi}
-Lý do: ${lydo}${note?'
-Ghi chú: '+note:''}`;
+  const msg='[BÁO NGHỈ] '+name+' - Lớp '+lop+'\nBuổi: '+buoi+'\nLý do: '+lydo+(note?'\nGhi chú: '+note:'');
   const encoded=encodeURIComponent(msg);
 
   // Zalo deep link — mở Zalo với số điện thoại thầy và nội dung điền sẵn
